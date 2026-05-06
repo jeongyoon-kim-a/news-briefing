@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>News Multi-Search</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+        "Malgun Gothic", sans-serif;
+      background: #fafaf7;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 80px 24px 40px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 960px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #6b6b6b;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .columns {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .column-header {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e8e8e0;
+    }
+
+    .column-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: #1a1a1a;
+    }
+
+    .column-meta {
+      font-size: 12px;
+      color: #9a9a93;
+    }
+
+    .search-input {
+      width: 100%;
+      font-size: 16px;
+      padding: 14px 18px;
+      border: 1px solid #d4d4cf;
+      border-radius: 10px;
+      background: #ffffff;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      font-family: inherit;
+      margin-bottom: 12px;
+    }
+
+    .search-input:focus {
+      border-color: #888;
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .toggle-presets {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      padding: 4px 0;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-family: inherit;
+      color: #6b6b6b;
+      margin-bottom: 8px;
+      transition: color 0.15s;
+    }
+
+    .toggle-presets:hover {
+      color: #1a1a1a;
+    }
+
+    .toggle-presets .arrow {
+      font-size: 10px;
+      line-height: 1;
+      transition: transform 0.15s;
+      display: inline-block;
+    }
+
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+
+    .presets.hidden {
+      display: none;
+    }
+
+    .preset-chip {
+      font-size: 12px;
+      padding: 5px 11px;
+      border: 1px solid #e0e0d8;
+      border-radius: 999px;
+      background: #ffffff;
+      cursor: pointer;
+      font-family: inherit;
+      color: #5a5a52;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    .preset-chip:hover {
+      background: #f3f3ee;
+      border-color: #b5b5af;
+      color: #1a1a1a;
+    }
+
+    .preset-chip:active {
+      transform: scale(0.96);
+    }
+
+    .preset-chip.cat-musk {
+      background: #efedf9;
+      border-color: #d6d2ee;
+      color: #4a3f8a;
+    }
+
+    .preset-chip.cat-musk:hover {
+      background: #e1ddf3;
+      border-color: #b5acdf;
+      color: #2e2566;
+    }
+
+    .preset-chip.cat-bigtech {
+      background: #e6f2ee;
+      border-color: #c5e0d6;
+      color: #1f6b56;
+    }
+
+    .preset-chip.cat-bigtech:hover {
+      background: #d3e8df;
+      border-color: #9ec9b9;
+      color: #134d3e;
+    }
+
+    .preset-chip.cat-fintech {
+      background: #f9efdb;
+      border-color: #ecd9b5;
+      color: #8a6420;
+    }
+
+    .preset-chip.cat-fintech:hover {
+      background: #f2e3c1;
+      border-color: #d8bf8f;
+      color: #654716;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .label {
+      font-size: 13px;
+      color: #6b6b6b;
+    }
+
+    .open-all {
+      font-size: 13px;
+      padding: 8px 14px;
+      border: 1px solid #d4d4cf;
+      border-radius: 8px;
+      background: #ffffff;
+      cursor: pointer;
+      font-family: inherit;
+      color: #1a1a1a;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .open-all:hover {
+      background: #f3f3ee;
+      border-color: #b5b5af;
+    }
+
+    .open-all:active {
+      transform: scale(0.98);
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .site-btn {
+      font-size: 14px;
+      padding: 14px 12px;
+      border: 1px solid #d4d4cf;
+      border-radius: 10px;
+      background: #ffffff;
+      cursor: pointer;
+      font-family: inherit;
+      color: #1a1a1a;
+      transition: background 0.15s, border-color 0.15s;
+      text-align: center;
+    }
+
+    .site-btn:hover {
+      background: #f3f3ee;
+      border-color: #888;
+    }
+
+    .site-btn:active {
+      transform: scale(0.98);
+    }
+
+    .site-btn .domain {
+      font-size: 11px;
+      color: #9a9a93;
+      margin-top: 3px;
+      letter-spacing: 0.02em;
+    }
+
+    .footer-note {
+      background: #f3f3ee;
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 13px;
+      color: #6b6b6b;
+      line-height: 1.6;
+    }
+
+    .footer-note strong {
+      color: #1a1a1a;
+      font-weight: 500;
+    }
+
+    @media (min-width: 720px) {
+      .columns {
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>News Multi-Search</h1>
+    <p class="subtitle">한 번의 검색으로 여러 매체를 동시에</p>
+
+    <div class="columns">
+      <div class="column">
+        <div class="column-header">
+          <span class="column-title">국내</span>
+          <span class="column-meta">Domestic</span>
+        </div>
+
+        <input
+          type="text"
+          id="q-domestic"
+          class="search-input"
+          placeholder="검색어 입력 (예: 스페이스X, 스테이블코인)"
+          autofocus
+        />
+
+        <button class="toggle-presets" id="toggle-domestic" aria-label="자주 쓰는 검색어 토글">
+          <span class="arrow">▼</span>
+          <span>자주 쓰는 검색어</span>
+        </button>
+
+        <div class="presets" id="presets-domestic"></div>
+
+        <div class="actions">
+          <span class="label">매체 선택</span>
+          <button class="open-all" data-scope="domestic">전체 열기 ↗</button>
+        </div>
+
+        <div class="buttons" id="buttons-domestic"></div>
+      </div>
+
+      <div class="column">
+        <div class="column-header">
+          <span class="column-title">국제</span>
+          <span class="column-meta">International</span>
+        </div>
+
+        <input
+          type="text"
+          id="q-international"
+          class="search-input"
+          placeholder="Search term (e.g., SpaceX, stablecoin)"
+        />
+
+        <button class="toggle-presets" id="toggle-international" aria-label="Toggle saved searches">
+          <span class="arrow">▼</span>
+          <span>Saved searches</span>
+        </button>
+
+        <div class="presets" id="presets-international"></div>
+
+        <div class="actions">
+          <span class="label">Select source</span>
+          <button class="open-all" data-scope="international">Open all ↗</button>
+        </div>
+
+        <div class="buttons" id="buttons-international"></div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      <strong>사용법</strong><br>
+      국내·국제 검색창은 독립적으로 동작합니다. 각 검색창에 검색어를 입력하고 매체 버튼을 누르면 새 탭에서 검색 결과가 열립니다.
+      Enter를 누르거나 "전체 열기"를 클릭하면 모든 매체에서의 검색 결과가 한 번에 열립니다.
+      자주 쓰는 검색어(Saved searches)의 버튼 클릭 시 간편하게 검색창에 검색어를 입력할 수 있습니다.
+      검색어 없이 매체 버튼 클릭 시 매체의 메인 화면이 열립니다.
+      구독이 필요한 매체의 경우 해당 브라우저에 로그인 정보가 저장되어 있다면 문제 없이 사용할 수 있습니다.
+      처음 사용 시 브라우저가 여러 탭 열기를 팝업으로 차단할 수 있으니, 이 사이트의 팝업을 허용해 주세요.
+    </div>
+  </div>
+
+  <script>
+    const sites = {
+      domestic: [
+        {
+          name: "한국경제",
+          domain: "hankyung.com",
+          home: "https://www.hankyung.com/",
+          url: q => `https://search.hankyung.com/search/news?query=${q}`
+        },
+        {
+          name: "매일경제",
+          domain: "mk.co.kr",
+          home: "https://www.mk.co.kr/",
+          url: q => `https://www.mk.co.kr/search?word=${q}`
+        },
+        {
+          name: "AI타임스",
+          domain: "aitimes.com",
+          home: "https://www.aitimes.com/",
+          url: q => `https://www.aitimes.com/news/articleList.html?sc_area=A&view_type=sm&sc_word=${q}`
+        },
+        {
+          name: "ZDNet Korea",
+          domain: "zdnet.co.kr",
+          home: "https://zdnet.co.kr/",
+          url: q => `https://search.zdnet.co.kr/?kwd=${q}`
+        }
+      ],
+      international: [
+        {
+          name: "Bloomberg",
+          domain: "bloomberg.com",
+          home: "https://www.bloomberg.com/",
+          url: q => `https://www.bloomberg.com/search?query=${q}`
+        },
+        {
+          name: "The Information",
+          domain: "theinformation.com",
+          home: "https://www.theinformation.com/",
+          url: q => `https://www.theinformation.com/search?query=${q}`
+        },
+        {
+          name: "The Economist",
+          domain: "economist.com",
+          home: "https://www.economist.com/",
+          url: q => `https://www.economist.com/search?q=${q}`
+        },
+        {
+          name: "SCMP",
+          domain: "scmp.com",
+          home: "https://www.scmp.com/",
+          url: q => `https://www.scmp.com/search/${q}?q=${q}`
+        }
+      ]
+    };
+
+    const presets = {
+      domestic: [
+        { category: "musk", terms: ["일론 머스크", "스페이스X", "테슬라", "뉴럴링크", "xAI"] },
+        { category: "bigtech", terms: ["엔비디아", "알파벳", "아마존", "메타", "마이크로소프트"] },
+        { category: "fintech", terms: ["스테이블코인", "디지털자산", "로빈후드", "푸투홀딩스", "서클", "코인베이스"] }
+      ],
+      international: [
+        { category: "musk", terms: ["Elon Musk", "SpaceX", "Tesla", "Neuralink", "xAI"] },
+        { category: "bigtech", terms: ["Nvidia", "Alphabet", "Amazon", "Meta", "Microsoft"] },
+        { category: "fintech", terms: ["Stablecoin", "Robinhood", "Futu Holdings", "Circle", "Coinbase"] }
+      ]
+    };
+
+    function renderButtons(scope) {
+      const containerEl = document.getElementById(`buttons-${scope}`);
+      const inputEl = document.getElementById(`q-${scope}`);
+
+      sites[scope].forEach(site => {
+        const btn = document.createElement("button");
+        btn.className = "site-btn";
+        btn.innerHTML = `${site.name}<div class="domain">${site.domain}</div>`;
+        btn.onclick = () => openSite(site, inputEl);
+        containerEl.appendChild(btn);
+      });
+    }
+
+    function renderPresets(scope) {
+      const containerEl = document.getElementById(`presets-${scope}`);
+      const inputEl = document.getElementById(`q-${scope}`);
+
+      presets[scope].forEach(group => {
+        group.terms.forEach(term => {
+          const chip = document.createElement("button");
+          chip.className = `preset-chip cat-${group.category}`;
+          chip.textContent = term;
+          chip.onclick = () => {
+            inputEl.value = term;
+            inputEl.focus();
+          };
+          containerEl.appendChild(chip);
+        });
+      });
+    }
+
+    function getQuery(inputEl) {
+      return inputEl.value.trim();
+    }
+
+    function openSite(site, inputEl) {
+      const q = getQuery(inputEl);
+      const target = q ? site.url(encodeURIComponent(q)) : site.home;
+      window.open(target, "_blank", "noopener,noreferrer");
+    }
+
+    function openAll(scope) {
+      const inputEl = document.getElementById(`q-${scope}`);
+      const q = getQuery(inputEl);
+      sites[scope].forEach(site => {
+        const target = q ? site.url(encodeURIComponent(q)) : site.home;
+        window.open(target, "_blank", "noopener,noreferrer");
+      });
+    }
+
+    renderButtons("domestic");
+    renderButtons("international");
+    renderPresets("domestic");
+    renderPresets("international");
+
+    function setupToggle(scope) {
+      const toggleEl = document.getElementById(`toggle-${scope}`);
+      const arrowEl = toggleEl.querySelector(".arrow");
+      const presetsEl = document.getElementById(`presets-${scope}`);
+      const storageKey = `presets-visible-${scope}`;
+
+      // 저장된 상태 복원 (기본값: 펼침)
+      let isVisible = true;
+      try {
+        const saved = localStorage.getItem(storageKey);
+        if (saved !== null) isVisible = saved === "true";
+      } catch (e) {
+        // localStorage 비활성화 환경에서도 정상 동작하도록 무시
+      }
+
+      function applyState() {
+        if (isVisible) {
+          presetsEl.classList.remove("hidden");
+          arrowEl.textContent = "▼";
+        } else {
+          presetsEl.classList.add("hidden");
+          arrowEl.textContent = "▶";
+        }
+      }
+
+      applyState();
+
+      toggleEl.onclick = () => {
+        isVisible = !isVisible;
+        applyState();
+        try {
+          localStorage.setItem(storageKey, String(isVisible));
+        } catch (e) {
+          // 무시
+        }
+      };
+    }
+
+    setupToggle("domestic");
+    setupToggle("international");
+
+    document.querySelectorAll(".open-all").forEach(btn => {
+      btn.onclick = () => openAll(btn.dataset.scope);
+    });
+
+    ["domestic", "international"].forEach(scope => {
+      document.getElementById(`q-${scope}`).addEventListener("keydown", e => {
+        if (e.key === "Enter") openAll(scope);
+      });
+    });
+  </script>
+</body>
+</html>
