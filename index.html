@@ -188,6 +188,30 @@
       color: #654716;
     }
 
+    .preset-chip.cat-korea-platform {
+      background: #fbe7e1;
+      border-color: #f1c9bd;
+      color: #8c3a23;
+    }
+
+    .preset-chip.cat-korea-platform:hover {
+      background: #f6d4c8;
+      border-color: #e0a892;
+      color: #6b2614;
+    }
+
+    .preset-chip.cat-mirae {
+      background: #e3e7f2;
+      border-color: #c2cbe0;
+      color: #344571;
+    }
+
+    .preset-chip.cat-mirae:hover {
+      background: #ced5e7;
+      border-color: #9ba9c8;
+      color: #1f2f57;
+    }
+
     .actions {
       display: flex;
       align-items: center;
@@ -259,7 +283,7 @@
     .footer-note {
       background: #f3f3ee;
       border-radius: 8px;
-      padding: 14px 16px;
+      padding: 16px 20px;
       font-size: 13px;
       color: #6b6b6b;
       line-height: 1.6;
@@ -268,6 +292,31 @@
     .footer-note strong {
       color: #1a1a1a;
       font-weight: 500;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .footer-note ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .footer-note li {
+      position: relative;
+      padding-left: 14px;
+      margin-bottom: 6px;
+    }
+
+    .footer-note li:last-child {
+      margin-bottom: 0;
+    }
+
+    .footer-note li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: #b5b5af;
     }
 
     @media (min-width: 720px) {
@@ -343,13 +392,17 @@
     </div>
 
     <div class="footer-note">
-      <strong>사용법</strong><br>
-      국내·국제 검색창은 독립적으로 동작합니다. 각 검색창에 검색어를 입력하고 매체 버튼을 누르면 새 탭에서 검색 결과가 열립니다.
-      Enter를 누르거나 "전체 열기"를 클릭하면 모든 매체에서의 검색 결과가 한 번에 열립니다.
-      자주 쓰는 검색어(Saved searches)의 버튼 클릭 시 간편하게 검색창에 검색어를 입력할 수 있습니다.
-      검색어 없이 매체 버튼 클릭 시 매체의 메인 화면이 열립니다.
-      구독이 필요한 매체의 경우 해당 브라우저에 로그인 정보가 저장되어 있다면 문제 없이 사용할 수 있습니다.
-      처음 사용 시 브라우저가 여러 탭 열기를 팝업으로 차단할 수 있으니, 이 사이트의 팝업을 허용해 주세요.
+      <strong>사용법</strong>
+      <ul>
+        <li>국내·국제 검색창은 독립적으로 동작합니다.</li>
+        <li>각 검색창에 검색어를 입력하고 매체 버튼을 누르면 새 탭에서 검색 결과가 열립니다.</li>
+        <li>Enter를 누르거나 "전체 열기"를 클릭하면 모든 매체에서의 검색 결과가 한 번에 열립니다.</li>
+        <li>자주 쓰는 검색어(Saved searches)의 버튼을 클릭하면 간편하게 검색창에 검색어를 입력할 수 있습니다.</li>
+        <li>검색어 없이 매체 버튼 클릭 시 매체의 메인 화면이 열립니다.</li>
+        <li>대부분의 매체는 최신 순 정렬을 기본으로 적용했습니다. (Bloomberg는 자체 정렬 기준 적용)</li>
+        <li>구독이 필요한 매체의 경우 해당 브라우저에 로그인 정보가 저장되어 있다면 문제 없이 사용할 수 있습니다.</li>
+        <li>처음 사용 시 브라우저가 여러 탭 열기를 팝업으로 차단할 수 있으니, 이 사이트의 팝업을 허용해 주세요.</li>
+      </ul>
     </div>
   </div>
 
@@ -360,19 +413,29 @@
           name: "한국경제",
           domain: "hankyung.com",
           home: "https://www.hankyung.com/",
-          url: q => `https://search.hankyung.com/search/news?query=${q}`
+          // sort=DATE/DESC: 최신순 정렬
+          url: q => `https://search.hankyung.com/search/news?query=${q}&sort=DATE/DESC`
         },
         {
           name: "매일경제",
           domain: "mk.co.kr",
           home: "https://www.mk.co.kr/",
-          url: q => `https://www.mk.co.kr/search?word=${q}`
+          // sort=1: 최신순 (mk.co.kr 검색 정렬 옵션)
+          url: q => `https://www.mk.co.kr/search?word=${q}&sort=1`
+        },
+        {
+          name: "연합 인포맥스",
+          domain: "news.einfomax.co.kr",
+          home: "https://news.einfomax.co.kr/",
+          // 한국 언론사 공통 CMS (한국언론진흥재단 articleList) - sc_order=1은 최신순
+          url: q => `https://news.einfomax.co.kr/news/articleList.html?sc_area=A&view_type=sm&sc_word=${q}&sc_order=1`
         },
         {
           name: "AI타임스",
           domain: "aitimes.com",
           home: "https://www.aitimes.com/",
-          url: q => `https://www.aitimes.com/news/articleList.html?sc_area=A&view_type=sm&sc_word=${q}`
+          // 동일 CMS - sc_order=1은 최신순
+          url: q => `https://www.aitimes.com/news/articleList.html?sc_area=A&view_type=sm&sc_word=${q}&sc_order=1`
         },
         {
           name: "ZDNet Korea",
@@ -386,25 +449,44 @@
           name: "Bloomberg",
           domain: "bloomberg.com",
           home: "https://www.bloomberg.com/",
+          // Bloomberg는 URL 파라미터로 정렬 변경 지원 안 함 (자체 알고리즘 기준)
           url: q => `https://www.bloomberg.com/search?query=${q}`
         },
         {
           name: "The Information",
           domain: "theinformation.com",
           home: "https://www.theinformation.com/",
-          url: q => `https://www.theinformation.com/search?query=${q}`
+          // sort=date: 최신순 정렬
+          url: q => `https://www.theinformation.com/search?query=${q}&sort=date`
         },
         {
-          name: "The Economist",
-          domain: "economist.com",
-          home: "https://www.economist.com/",
-          url: q => `https://www.economist.com/search?q=${q}`
+          name: "Barron's",
+          domain: "barrons.com",
+          home: "https://www.barrons.com/",
+          // Barron's는 기업명 검색 시 자동으로 티커 매칭을 하므로 별도 변환 불필요.
+          // 검색창 직접 입력 시 사용되는 URL 패턴을 따름.
+          url: q => `https://www.barrons.com/search?query=${q}&quotequery=${q}&mod=DNH_S&search_keywords=${q}&search_statement_type=typed`
         },
         {
           name: "SCMP",
           domain: "scmp.com",
           home: "https://www.scmp.com/",
-          url: q => `https://www.scmp.com/search/${q}?q=${q}`
+          // sort=relevance가 기본; sort=date로 최신순
+          url: q => `https://www.scmp.com/search/${q}?sort=date`
+        },
+        {
+          name: "MIT Technology Review",
+          domain: "technologyreview.com",
+          home: "https://www.technologyreview.com/",
+          // WordPress 기반 검색 (?s=쿼리)
+          url: q => `https://www.technologyreview.com/search/?s=${q}`
+        },
+        {
+          name: "The Economist",
+          domain: "economist.com",
+          home: "https://www.economist.com/",
+          // sort=date: 최신순
+          url: q => `https://www.economist.com/search?q=${q}&sort=date`
         }
       ]
     };
@@ -413,12 +495,14 @@
       domestic: [
         { category: "musk", terms: ["일론 머스크", "스페이스X", "테슬라", "뉴럴링크", "xAI"] },
         { category: "bigtech", terms: ["엔비디아", "알파벳", "아마존", "메타", "마이크로소프트"] },
-        { category: "fintech", terms: ["스테이블코인", "디지털자산", "로빈후드", "푸투홀딩스", "서클", "코인베이스"] }
+        { category: "fintech", terms: ["디지털자산", "스테이블코인", "코인베이스", "로빈후드", "푸투홀딩스", "서클"] },
+        { category: "korea-platform", terms: ["카카오", "네이버", "토스"] },
+        { category: "mirae", terms: ["미래에셋"] }
       ],
       international: [
         { category: "musk", terms: ["Elon Musk", "SpaceX", "Tesla", "Neuralink", "xAI"] },
         { category: "bigtech", terms: ["Nvidia", "Alphabet", "Amazon", "Meta", "Microsoft"] },
-        { category: "fintech", terms: ["Stablecoin", "Robinhood", "Futu Holdings", "Circle", "Coinbase"] }
+        { category: "fintech", terms: ["Stablecoin", "Coinbase", "Robinhood", "Futu Holdings", "Circle"] }
       ]
     };
 
